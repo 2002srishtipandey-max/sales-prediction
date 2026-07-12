@@ -1,4 +1,10 @@
+import matplotlib
+matplotlib.use('Agg')  # Yeh line Segmentation Fault ko rokti hai cloud servers par
+
 import streamlit as st
+import pandas as pd
+import numpy as np
+# ... baaki ka aapka code ...import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
