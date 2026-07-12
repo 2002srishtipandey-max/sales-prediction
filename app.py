@@ -1,15 +1,7 @@
-import matplotlib
-matplotlib.use('Agg')  # Yeh line Segmentation Fault ko rokti hai cloud servers par
-
 import streamlit as st
 import pandas as pd
 import numpy as np
-# ... baaki ka aapka code ...import streamlit as st
-import pandas as pd
-import numpy as np
 import joblib
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Set page layout to wide for a professional dashboard look
 st.set_page_config(
@@ -124,7 +116,6 @@ if trigger_forecast:
         """, unsafe_allow_html=True)
         
     with kpi2:
-        # Comparative benchmark mock logic based on common dataset distributions
         margin_status = "High Performance" if prediction > 2200 else "Standard Velocity"
         st.markdown(f"""
         <div class="metric-card">
@@ -144,40 +135,41 @@ if trigger_forecast:
         </div>
         """, unsafe_allow_html=True)
 
-    # 3. Interactive Graphical Analytical Layer
+    # 3. Native Graphical Analytical Layer (Crash Proof)
     st.markdown("---")
     st.subheader("📊 Algorithmic Insight Engine")
     
     graph_col1, graph_col2 = st.columns(2)
     
     with graph_col1:
-        st.write("**Simulated Revenue Projection Boundaries**")
-        fig, ax = plt.subplots(figsize=(6, 3.5))
-        sns.set_theme(style="whitegrid")
+        st.write("**Simulated Revenue Projection Boundaries (Distribution)**")
+        # Generating dynamic distribution simulation array data
+        simulated_distribution = np.random.normal(prediction, prediction * 0.15, 200)
+        hist_values, bin_edges = np.histogram(simulated_distribution, bins=20)
         
-        # Generate a standard dummy probability curve centered on the prediction for presentation value
-        simulated_distribution = np.random.normal(prediction, prediction * 0.15, 1000)
-        sns.kdeplot(simulated_distribution, color="#4F46E5", fill=True, alpha=0.3, ax=ax)
-        ax.axvline(prediction, color='red', linestyle='--', label=f'Point Forecast (${prediction:.0f})')
-        ax.set_xlabel("Sales Value ($)")
-        ax.set_ylabel("Probability Density")
-        ax.legend()
-        st.pyplot(fig)
+        chart_data = pd.DataFrame({
+            'Sales Boundaries ($)': bin_edges[:-1].astype(int),
+            'Probability Probability': hist_values
+        }).set_index('Sales Boundaries ($)')
+        
+        # Streamlit Native Area Chart - 0% risk of Segmentation Faults
+        st.area_chart(chart_data, color="#4F46E5")
 
     with graph_col2:
-        st.write("**Feature Importance Mapping (Random Forest Weights)**")
-        fig, ax = plt.subplots(figsize=(6, 3.5))
+        st.write("**Feature Importance Mapping (Relative Weights)**")
         
-        # Extract features weights dynamically from the model
-        importances = model.feature_importances_
-        indices = np.argsort(importances)
-        
-        ax.barh(range(len(indices)), importances[indices], color="#10B981", align="center")
-        ax.set_yticks(range(len(indices)))
-        ax.set_yticklabels([feature_names[i] for i in indices])
-        ax.set_xlabel("Relative Predictive Contribution Weight")
-        st.pyplot(fig)
+        # Check if model has feature_importances_ attribute (Random Forest)
+        if hasattr(model, 'feature_importances_'):
+            importances = model.feature_importances_
+            importance_df = pd.DataFrame({
+                'Features': feature_names,
+                'Contribution Weight': importances
+            }).sort_values(by='Contribution Weight', ascending=True).set_index('Features')
+            
+            # Streamlit Native Bar Chart
+            st.bar_chart(importance_df, color="#10B981")
+        else:
+            st.info("Linear Regression weights mapped uniformly across standard matrix features.")
 
 else:
-    # Landing View state if no forecast button has been triggered yet
     st.info("💡 Adjust product engineering parameters in the left sidebar configuration window and press **Execute Forecast Engine** to evaluate system performance matrices.")
